@@ -19,6 +19,7 @@ const customLoggerMiddleware = (request, response, next) => {
       oldEnd = response.end;
 
   let chunks = [];
+  // 
 
   response.write = function (chunk) {
     chunks.push(chunk);
