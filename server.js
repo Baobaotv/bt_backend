@@ -13,7 +13,7 @@ const log = new Logger();
 
 const customLoggerMiddleware = (request, response, next) => {
   const { method, originalUrl, body } = request;
-  log.info(`[REQ] ${method} ${originalUrl} ${JSON.stringify(body)}`);
+  log.info(`[REQ] ${method} ${originalUrl} ${JSON.stringify(!!body ? body : "")}`);
 
   let oldWrite = response.write,
       oldEnd = response.end;
