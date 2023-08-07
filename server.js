@@ -15,27 +15,28 @@ const customLoggerMiddleware = (request, response, next) => {
   const { method, originalUrl, body } = request;
   log.info(`[REQ] ${method} ${originalUrl} ${JSON.stringify(body)}`);
 
-  let errorMessage = null;
-  let body1 = [];
-  request.on("data", chunk => {
-    body1.push(chunk);
-  });
-  request.on("end", () => {
-    body1 = Buffer.concat(body1);
-    body1 = body1.toString();
-  });
-  request.on("error", error => {
-    errorMessage = error.message;
-  });
+  let oldWrite = response.write,
+      oldEnd = response.end;
 
-  response.on("finish", () => {
-    const { method } = request;
-    const { statusCode } = response;
+  let chunks = [];
+
+  response.write = function (chunk) {
+    chunks.push(chunk);
+    return oldWrite.apply(response, arguments);
+  };
+
+  response.end = function (chunk) {
+    if (chunk)
+      chunks.push(chunk);
+      const { statusCode } = response;
+
+    var body1 = Buffer.concat(chunks).toString('utf8');
     log.info(
       `[RESP] ${method} ${originalUrl} ${statusCode} ${body1}`,
     );
-  });
 
+    oldEnd.apply(response, arguments);
+  };
   next();
 };
 
