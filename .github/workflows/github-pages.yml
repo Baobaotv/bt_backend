@@ -1,4 +1,4 @@
-name: Deploy
+name: Docker build
 on:
     push:
         branches:
@@ -13,6 +13,7 @@ env:
 jobs:
     build:
         runs-on: ubuntu-latest
+
         steps:
             - name: Checkout code
               uses: actions/checkout@v1    
@@ -43,5 +44,4 @@ jobs:
                   echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
                   chmod 600 ~/.ssh/id_rsa
                   ssh ubuntu@$SSH_ADDRESS "docker pull baonx/tutorials-be:latest; 
-                  docker stop tutorials-be;
-                  docker rm tutorials-be;"
+                  "
