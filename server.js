@@ -8,6 +8,40 @@ var corsOptions = {
   origin: "http://localhost:8081"
 };
 
+const Logger = require('logger-nodejs');
+const log = new Logger();
+
+const customLoggerMiddleware = (request, response, next) => {
+  const { method, originalUrl, body } = request;
+  log.info(`[REQ] ${method} ${originalUrl} ${JSON.stringify(body)}`);
+
+  let errorMessage = null;
+  let body1 = [];
+  request.on("data", chunk => {
+    body1.push(chunk);
+  });
+  request.on("end", () => {
+    body1 = Buffer.concat(body1);
+    body1 = body1.toString();
+  });
+  request.on("error", error => {
+    errorMessage = error.message;
+  });
+
+  response.on("finish", () => {
+    const { method } = request;
+    const { statusCode } = response;
+    log.info(
+      `[RESP] ${method} ${originalUrl} ${statusCode} ${body1}`,
+    );
+  });
+
+  next();
+};
+
+// Sử dụng custom logger middleware
+app.use(customLoggerMiddleware);
+
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
