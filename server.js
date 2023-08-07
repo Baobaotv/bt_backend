@@ -26,14 +26,21 @@ const customLoggerMiddleware = (request, response, next) => {
   };
 
   response.end = function (chunk) {
+    const { statusCode } = response;
     if (chunk)
       chunks.push(chunk);
-      const { statusCode } = response;
-
-    var body1 = Buffer.concat(chunks).toString('utf8');
-    log.info(
-      `[RESP] ${method} ${originalUrl} ${statusCode} ${body1}`,
-    );
+    if (statusCode === 200) {
+      let body1 = !!chunks && chunks.length > 0 ? Buffer.concat(chunks).toString('utf8') : "";
+      log.info(
+        `[RESP] ${method} ${originalUrl} ${statusCode} ${body1}`,
+      );
+    } else {
+      let body1 = chunk;
+      log.info(
+        `[RESP] ${method} ${originalUrl} ${statusCode} ${body1}`,
+      );
+    }
+    
 
     oldEnd.apply(response, arguments);
   };
