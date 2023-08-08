@@ -13,7 +13,7 @@ const log = new Logger();
 
 const customLoggerMiddleware = (request, response, next) => {
   const { method, originalUrl, body } = request;
-  log.info(`[REQ] ${method} ${originalUrl} ${JSON.stringify(!!body ? body : "")}`);
+  log.info(`[REQUEST] ${method} ${originalUrl} ${JSON.stringify(!!body ? body : "")}`);
 
   let oldWrite = response.write,
       oldEnd = response.end;
@@ -32,12 +32,12 @@ const customLoggerMiddleware = (request, response, next) => {
     if (statusCode === 200) {
       let body1 = !!chunks && chunks.length > 0 ? Buffer.concat(chunks).toString('utf8') : "";
       log.info(
-        `[RESP] ${method} ${originalUrl} ${statusCode} ${body1}`,
+        `[RESPONSE] ${method} ${originalUrl} ${statusCode} ${body1}`,
       );
     } else {
       let body1 = chunk;
       log.info(
-        `[RESP] ${method} ${originalUrl} ${statusCode} ${body1}`,
+        `[RESPONSE] ${method} ${originalUrl} ${statusCode} ${body1}`,
       );
     }
     
